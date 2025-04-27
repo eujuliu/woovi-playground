@@ -1,14 +1,27 @@
-version: '3.8'
-
 services:
   mongodb:
     image: mongo
     container_name: mongodb
+    networks:
+      - woovi-network
     ports:
       - "27017:27017"
     environment:
-      - MONGO_INITDB_DATABASE=woovi-playground
+      MONGO_INITDB_DATABASE: woovi-playground
     restart: always
+
+  mongo-gui:
+    image: mongo-express
+    restart: always
+    container_name: mongo-gui
+    networks:
+      - woovi-network
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: woovi
+      ME_CONFIG_MONGODB_URL: mongodb://mongodb:27017/?directConnection=true&appName=mongosh+1.10.5
 
   redis:
     image: redis
@@ -16,3 +29,7 @@ services:
     ports:
       - "6379:6379"
     restart: always
+
+networks:
+  woovi-network:
+    driver: bridge
