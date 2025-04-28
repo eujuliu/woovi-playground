@@ -7,7 +7,7 @@ import { redisPubSub } from '../../pubSub/redisPubSub';
 import { PUB_SUB_EVENTS } from '../../pubSub/pubSubEvents';
 
 type MessageAddedPayload = {
-	message: string;
+	content: string;
 };
 
 const subscription = subscriptionWithClientId({
@@ -16,7 +16,7 @@ const subscription = subscriptionWithClientId({
 		() => redisPubSub.asyncIterator(PUB_SUB_EVENTS.MESSAGE.ADDED),
 		async (payload: MessageAddedPayload, context) => {
 			const message = await Message.findOne({
-				_id: payload.message,
+				_id: payload.content,
 			});
 
 			if (!message) {
@@ -27,7 +27,7 @@ const subscription = subscriptionWithClientId({
 		}
 	),
 	getPayload: async (obj: MessageAddedPayload) => ({
-		message: obj?.message,
+		message: obj?.content,
 	}),
 	outputFields: {
 		...messageField('message'),
