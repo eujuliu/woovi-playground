@@ -1,21 +1,21 @@
-import { Container } from '@mui/material';
+import { Container } from "@mui/material";
 
 type LayoutProps = {
-	children?: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 export const Layout = ({ children }: LayoutProps) => {
-	return (
-		<Container
-			maxWidth="sm"
-			sx={{
-				backgroundColor: 'white',
-				p: 2,
-				height: '100vh',
-				overflowY: 'scroll',
-			}}
-		>
-			{children}
-		</Container>
-	);
+  return (
+    <Container
+      maxWidth="sm"
+      sx={{
+        backgroundColor: "white",
+        p: 2,
+        height: "100vh",
+        overflowY: "scroll",
+      }}
+    >
+      {children}
+    </Container>
+  );
 };

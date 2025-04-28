@@ -1,3 +1,3 @@
-import { AccountAddMutation } from './AccountAddMutation';
+import { AccountAddMutation } from "./AccountAddMutation";
 
 export const accountMutations = { AccountAdd: AccountAddMutation };

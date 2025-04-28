@@ -90,7 +90,7 @@ git clone https://github.com/entria/woovi-playground.git
    ```
 
 2. Run the container(or stop it, if necessary):
-  
+
    ```sh
    pnpm compose:up
    ```
@@ -103,9 +103,9 @@ git clone https://github.com/entria/woovi-playground.git
 
 4. Run the relay
 
-    ```sh
-    pnpm relay
-    ```
+   ```sh
+   pnpm relay
+   ```
 
 5. Run the Project
 
