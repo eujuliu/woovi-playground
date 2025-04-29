@@ -1,26 +1,26 @@
-import { useMemo } from "react";
-import { useSubscription } from "react-relay";
-import { GraphQLSubscriptionConfig } from "relay-runtime";
+import { useMemo } from 'react';
+import { useSubscription } from 'react-relay';
+import { GraphQLSubscriptionConfig } from 'relay-runtime';
 import {
-  MessageAddedSubscription,
-  MessageAddedSubscription$variables,
-} from "../../__generated__/MessageAddedSubscription.graphql";
-import { MessageAdded } from "./MessageAddedSubscription";
+	MessageAddedSubscription,
+	MessageAddedSubscription$variables,
+} from '../../__generated__/MessageAddedSubscription.graphql';
+import { MessageAdded } from './MessageAddedSubscription';
 
 const useMessageAddedSubscription = (
-  variables: MessageAddedSubscription$variables,
+	variables: MessageAddedSubscription$variables
 ) => {
-  const newMessageConfig = useMemo<
-    GraphQLSubscriptionConfig<MessageAddedSubscription>
-  >(
-    () => ({
-      subscription: MessageAdded,
-      variables,
-    }),
-    [variables],
-  );
+	const newMessageConfig = useMemo<
+		GraphQLSubscriptionConfig<MessageAddedSubscription>
+	>(
+		() => ({
+			subscription: MessageAdded,
+			variables,
+		}),
+		[variables]
+	);
 
-  useSubscription(newMessageConfig);
+	useSubscription(newMessageConfig);
 };
 
 export { useMessageAddedSubscription };
