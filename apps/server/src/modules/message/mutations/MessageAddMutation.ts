@@ -7,6 +7,8 @@ import { PUB_SUB_EVENTS } from '../../pubSub/pubSubEvents';
 import { Message } from '../MessageModel';
 import { messageField } from '../messageFields';
 
+import { z } from 'zod';
+
 export type MessageAddInput = {
 	content: string;
 };
@@ -19,15 +21,25 @@ const mutation = mutationWithClientMutationId({
 		},
 	},
 	mutateAndGetPayload: async (args: MessageAddInput) => {
+		const Schema = z
+			.object({
+				content: z.string().min(1).nonempty(),
+			})
+			.transform((data) => ({
+				content: data.content.trim(),
+			}));
+
 		try {
-			if (args.content.trim().length < 1) {
-				throw new GraphQLError("Can't create an empty message", {
-					extensions: { code: 'EMPTY_MESSAGE' },
+			const result = Schema.safeParse(args);
+
+			if (!result.success) {
+				throw new GraphQLError(result.error.message, {
+					extensions: { code: 'BAD_USER_INPUT' },
 				});
 			}
 
 			const message = await new Message({
-				content: args.content,
+				content: result.data.content,
 			}).save();
 
 			redisPubSub.publish(PUB_SUB_EVENTS.MESSAGE.ADDED, {

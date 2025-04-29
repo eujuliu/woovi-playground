@@ -73,7 +73,7 @@ describe('TRANSACTION MUTATION', () => {
 		})) as any;
 
 		expect(result).toHaveProperty('errors');
-		expect(result.errors[0].extensions.code).toBe('INVALID_TRANSACTION');
+		expect(result.errors[0].extensions.code).toBe('BAD_USER_INPUT');
 		expect(result.data.TransactionAdd).toBeNull();
 	});
 

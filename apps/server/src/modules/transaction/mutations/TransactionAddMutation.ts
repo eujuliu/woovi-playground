@@ -12,6 +12,9 @@ import { Account } from '../../account/AccountModel';
 import { redisPubSub } from '../../pubSub/redisPubSub';
 import { PUB_SUB_EVENTS } from '../../pubSub/pubSubEvents';
 
+import { z } from 'zod';
+import mongoose from 'mongoose';
+
 export type TransactionAddInput = {
 	senderId: string;
 	receiverId: string;
@@ -34,24 +37,49 @@ const mutation = mutationWithClientMutationId({
 	mutateAndGetPayload: async (args: TransactionAddInput) => {
 		const session = await Transaction.startSession();
 
+		const Schema = z
+			.object({
+				senderId: z
+					.string()
+					.nonempty()
+					.refine((id) => mongoose.Types.ObjectId.isValid(id), {
+						message: 'Invalid MongoDB ID',
+					}),
+				receiverId: z
+					.string()
+					.nonempty()
+					.refine((id) => mongoose.Types.ObjectId.isValid(id), {
+						message: 'Invalid MongoDB ID',
+					}),
+				amount: z.number().positive(),
+			})
+			.transform((data) => ({
+				senderId: data.senderId.trim(),
+				receiverId: data.receiverId.trim(),
+				amount: data.amount,
+			}))
+			.refine((data) => data.senderId !== data.receiverId, {
+				message: 'Sender and receiver cannot be the same account',
+				path: ['receiverId'],
+			});
+
 		try {
 			session.startTransaction();
 
-			if (args.receiverId === args.senderId) {
-				throw new GraphQLError(
-					"You can't send a transaction to the same account",
-					{
-						extensions: { code: 'INVALID_TRANSACTION' },
-					}
-				);
+			const result = Schema.safeParse(args);
+
+			if (!result.success) {
+				throw new GraphQLError(result.error.message, {
+					extensions: { code: 'BAD_USER_INPUT' },
+				});
 			}
 
 			const sender = await Account.findOne({
-				_id: args.senderId,
+				_id: result.data.senderId,
 			}).session(session);
 
 			const receiver = await Account.findOne({
-				_id: args.receiverId,
+				_id: result.data.receiverId,
 			}).session(session);
 
 			if (!sender || !receiver) {
@@ -62,7 +90,7 @@ const mutation = mutationWithClientMutationId({
 
 			if (
 				!sender.balance ||
-				(sender.balance && sender.balance - args.amount < 0)
+				(sender.balance && sender.balance - result.data.amount < 0)
 			) {
 				throw new GraphQLError(
 					"Sender user don't have balance for this transaction",
@@ -72,8 +100,8 @@ const mutation = mutationWithClientMutationId({
 				);
 			}
 
-			sender.balance -= args.amount;
-			receiver.balance += args.amount;
+			sender.balance -= result.data.amount;
+			receiver.balance += result.data.amount;
 
 			await sender.save({ session });
 			await receiver.save({ session });
@@ -81,7 +109,7 @@ const mutation = mutationWithClientMutationId({
 			const transaction = await new Transaction({
 				senderId: sender._id.toString(),
 				receiverId: receiver._id.toString(),
-				amount: args.amount,
+				amount: result.data.amount,
 			}).save({ session });
 
 			await session.commitTransaction();

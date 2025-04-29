@@ -50,6 +50,6 @@ describe('MESSAGE MUTATION', () => {
 		})) as any;
 
 		expect(result).toHaveProperty('errors');
-		expect(result.errors[0].extensions.code).toBe('EMPTY_MESSAGE');
+		expect(result.errors[0].extensions.code).toBe('BAD_USER_INPUT');
 	});
 });
