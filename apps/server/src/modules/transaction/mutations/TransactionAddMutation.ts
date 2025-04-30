@@ -9,8 +9,8 @@ import { mutationWithClientMutationId } from 'graphql-relay';
 import { Transaction } from '../TransactionModel';
 import { transactionField } from '../transactionFields';
 import { Account } from '../../account/AccountModel';
-import { redisPubSub } from '../../pubSub/redisPubSub';
-import { PUB_SUB_EVENTS } from '../../pubSub/pubSubEvents';
+import { redisPubSub } from '../../redis/redisPubSub';
+import { PUB_SUB_EVENTS } from '../../redis/pubSubEvents';
 
 import { z } from 'zod';
 import mongoose from 'mongoose';

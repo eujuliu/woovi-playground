@@ -1,8 +1,8 @@
 import { GraphQLString, GraphQLNonNull, GraphQLError } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
 
-import { redisPubSub } from '../../pubSub/redisPubSub';
-import { PUB_SUB_EVENTS } from '../../pubSub/pubSubEvents';
+import { redisPubSub } from '../../redis/redisPubSub';
+import { PUB_SUB_EVENTS } from '../../redis/pubSubEvents';
 
 import { Message } from '../MessageModel';
 import { messageField } from '../messageFields';

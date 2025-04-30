@@ -2,8 +2,8 @@ import { GraphQLError, GraphQLNonNull, GraphQLString } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
 
 import { Account } from '../AccountModel';
-import { redisPubSub } from '../../pubSub/redisPubSub';
-import { PUB_SUB_EVENTS } from '../../pubSub/pubSubEvents';
+import { redisPubSub } from '../../redis/redisPubSub';
+import { PUB_SUB_EVENTS } from '../../redis/pubSubEvents';
 import { accountField } from '../../account/accountFields';
 import { z } from 'zod';
 
@@ -29,7 +29,7 @@ const mutation = mutationWithClientMutationId({
 			const result = Schema.safeParse(args);
 
 			if (!result.success) {
-				throw new GraphQLError(result.error.message, {
+				throw new GraphQLError(result.error.issues[0].message, {
 					extensions: { code: 'BAD_USER_INPUT' },
 				});
 			}

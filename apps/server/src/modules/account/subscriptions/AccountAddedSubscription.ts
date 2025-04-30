@@ -1,7 +1,7 @@
 import { subscriptionWithClientId } from 'graphql-relay-subscription';
 import { withFilter } from 'graphql-subscriptions';
-import { redisPubSub } from '../../pubSub/redisPubSub';
-import { PUB_SUB_EVENTS } from '../../pubSub/pubSubEvents';
+import { redisPubSub } from '../../redis/redisPubSub';
+import { PUB_SUB_EVENTS } from '../../redis/pubSubEvents';
 import { Account } from '../AccountModel';
 import { accountField } from '../accountFields';
 

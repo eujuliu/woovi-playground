@@ -108,9 +108,12 @@ type AccountEdge {
 type Account implements Node {
   id: ID!
   name: String
-  balance: Int
+  balance: Long
   createdAt: String
 }
+
+"""A custom scalar to handle 64-bit integers"""
+scalar Long
 
 """A connection to a list of items."""
 type TransactionConnection {
