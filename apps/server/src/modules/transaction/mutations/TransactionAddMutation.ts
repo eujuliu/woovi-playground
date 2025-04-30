@@ -14,20 +14,24 @@ import { PUB_SUB_EVENTS } from '../../pubSub/pubSubEvents';
 
 import { z } from 'zod';
 import mongoose from 'mongoose';
+import { TransactionTypeEnum } from '../TransactionType';
 
 export type TransactionAddInput = {
-	senderId: string;
-	receiverId: string;
+	from: string;
+	to: string;
 	amount: number;
 };
 
 const mutation = mutationWithClientMutationId({
 	name: 'TransactionAdd',
 	inputFields: {
-		senderId: {
+		type: {
+			type: new GraphQLNonNull(TransactionTypeEnum),
+		},
+		from: {
 			type: new GraphQLNonNull(GraphQLString),
 		},
-		receiverId: {
+		to: {
 			type: new GraphQLNonNull(GraphQLString),
 		},
 		amount: {
@@ -39,13 +43,14 @@ const mutation = mutationWithClientMutationId({
 
 		const Schema = z
 			.object({
-				senderId: z
+				type: z.enum(['DEPOSIT', 'TRANSFER']),
+				from: z
 					.string()
 					.nonempty()
 					.refine((id) => mongoose.Types.ObjectId.isValid(id), {
 						message: 'Invalid MongoDB ID',
 					}),
-				receiverId: z
+				to: z
 					.string()
 					.nonempty()
 					.refine((id) => mongoose.Types.ObjectId.isValid(id), {
@@ -54,13 +59,14 @@ const mutation = mutationWithClientMutationId({
 				amount: z.number().positive(),
 			})
 			.transform((data) => ({
-				senderId: data.senderId.trim(),
-				receiverId: data.receiverId.trim(),
+				from: data.from.trim(),
+				to: data.to.trim(),
 				amount: data.amount,
+				type: data.type,
 			}))
-			.refine((data) => data.senderId !== data.receiverId, {
+			.refine((data) => data.from !== data.to, {
 				message: 'Sender and receiver cannot be the same account',
-				path: ['receiverId'],
+				path: ['to'],
 			});
 
 		try {
@@ -75,11 +81,11 @@ const mutation = mutationWithClientMutationId({
 			}
 
 			const sender = await Account.findOne({
-				_id: result.data.senderId,
+				_id: result.data.from,
 			}).session(session);
 
 			const receiver = await Account.findOne({
-				_id: result.data.receiverId,
+				_id: result.data.to,
 			}).session(session);
 
 			if (!sender || !receiver) {
@@ -107,8 +113,9 @@ const mutation = mutationWithClientMutationId({
 			await receiver.save({ session });
 
 			const transaction = await new Transaction({
-				senderId: sender._id.toString(),
-				receiverId: receiver._id.toString(),
+				type: result.data.type,
+				from: sender._id.toString(),
+				to: receiver._id.toString(),
 				amount: result.data.amount,
 			}).save({ session });
 

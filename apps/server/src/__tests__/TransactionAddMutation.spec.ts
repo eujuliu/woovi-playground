@@ -10,9 +10,10 @@ describe('TRANSACTION MUTATION', () => {
     ) {
         TransactionAdd(input: $input) {
             transaction {
-                id
-                senderId
-                receiverId
+                id,
+								type,
+                from,
+                to,
                 amount
             }
         }
@@ -30,8 +31,9 @@ describe('TRANSACTION MUTATION', () => {
 
 		const variables = {
 			input: {
-				senderId: sender._id.toString(),
-				receiverId: receiver._id.toString(),
+				type: 'TRANSFER',
+				from: sender._id.toString(),
+				to: receiver._id.toString(),
 				amount: 100,
 			},
 		};
@@ -51,6 +53,40 @@ describe('TRANSACTION MUTATION', () => {
 		expect(updatedSender?.balance).toBe(0);
 	});
 
+	it('should be possible to create a deposit', async () => {
+		const sender = await new Account({
+			name: 'ATM',
+			balance: 10000000,
+		}).save();
+		const receiver = await new Account({
+			name: 'Account 1',
+			balance: 0,
+		}).save();
+
+		const variables = {
+			input: {
+				type: 'DEPOSIT',
+				from: sender._id.toString(),
+				to: receiver._id.toString(),
+				amount: 100,
+			},
+		};
+
+		const result = (await graphql({
+			schema,
+			source: mutation,
+			variableValues: variables,
+			contextValue: getContext(),
+		})) as any;
+
+		const updatedSender = await Account.findById(sender._id);
+
+		expect(result).not.toHaveProperty('errors');
+		expect(result.data.TransactionAdd.transaction.amount).toBe(100);
+		expect(updatedSender).not.toBeNull();
+		expect(updatedSender?.balance).toBe(sender.balance - 100);
+	});
+
 	it('should not be possible to sender send balance for himself', async () => {
 		const sender = await new Account({
 			name: 'Account 1',
@@ -59,8 +95,9 @@ describe('TRANSACTION MUTATION', () => {
 
 		const variables = {
 			input: {
-				senderId: sender._id.toString(),
-				receiverId: sender._id.toString(),
+				type: 'TRANSFER',
+				from: sender._id.toString(),
+				to: sender._id.toString(),
 				amount: 100,
 			},
 		};
@@ -89,8 +126,9 @@ describe('TRANSACTION MUTATION', () => {
 
 		const variables = {
 			input: {
-				senderId: sender._id.toString(),
-				receiverId: receiver._id.toString(),
+				type: 'TRANSFER',
+				from: sender._id.toString(),
+				to: receiver._id.toString(),
 				amount: 100,
 			},
 		};

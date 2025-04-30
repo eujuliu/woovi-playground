@@ -133,10 +133,16 @@ type TransactionEdge {
 """Represents a transaction"""
 type Transaction implements Node {
   id: ID!
-  senderId: String
-  receiverId: String
+  type: TransactionTypeEnum
+  to: String
+  from: String
   amount: Int
   createdAt: String
+}
+
+enum TransactionTypeEnum {
+  DEPOSIT
+  TRANSFER
 }
 
 type Mutation {
@@ -171,8 +177,9 @@ type TransactionAddPayload {
 }
 
 input TransactionAddInput {
-  senderId: String!
-  receiverId: String!
+  type: TransactionTypeEnum!
+  from: String!
+  to: String!
   amount: Int!
   clientMutationId: String
 }
