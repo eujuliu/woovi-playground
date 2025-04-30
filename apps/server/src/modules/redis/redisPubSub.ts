@@ -1,5 +1,6 @@
-import { RedisPubSub } from "graphql-redis-subscriptions";
+import { RedisPubSub } from 'graphql-redis-subscriptions';
+import { redis } from './ioredis';
 
 export const redisPubSub = new RedisPubSub({
-  connection: process.env.REDIS_HOST,
+	subscriber: redis,
 });

@@ -1,14 +1,14 @@
-import { GraphQLObjectType } from "graphql";
+import { GraphQLObjectType } from 'graphql';
 
-import { messageMutations } from "../modules/message/mutations/messageMutations";
-import { accountMutations } from "../modules/account/mutations/accountMutations";
-import { transactionMutations } from "../modules/transaction/mutations/transactionMutations";
+import { messageMutations } from '../modules/message/mutations/messageMutations';
+import { accountMutations } from '../modules/account/mutations/accountMutations';
+import { transactionMutations } from '../modules/transaction/mutations/transactionMutations';
 
 export const MutationType = new GraphQLObjectType({
-  name: "Mutation",
-  fields: () => ({
-    ...messageMutations,
-    ...accountMutations,
-    ...transactionMutations,
-  }),
+	name: 'Mutation',
+	fields: () => ({
+		...messageMutations,
+		...accountMutations,
+		...transactionMutations,
+	}),
 });
