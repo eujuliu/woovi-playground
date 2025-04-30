@@ -14,7 +14,6 @@ const subscription = subscriptionWithClientId({
 	subscribe: withFilter(
 		() => redisPubSub.asyncIterator(PUB_SUB_EVENTS.ACCOUNT.ADDED),
 		async (payload: AccountAddedPayload, context) => {
-			console.log(payload);
 			const account = await Account.findOne({
 				_id: payload.message,
 			});

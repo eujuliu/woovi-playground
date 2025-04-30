@@ -2,11 +2,9 @@ import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 
 let mongoServer: MongoMemoryReplSet;
-
 beforeAll(async () => {
 	mongoServer = await MongoMemoryReplSet.create();
 	const uri = mongoServer.getUri();
-
 	await mongoose.connect(uri);
 });
 
