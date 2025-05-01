@@ -6,7 +6,7 @@ import { Transaction } from '../TransactionModel';
 import { transactionField } from '../transactionFields';
 
 type TransactionAddedPayload = {
-	message: string;
+	id: string;
 };
 
 const subscription = subscriptionWithClientId({
@@ -14,9 +14,8 @@ const subscription = subscriptionWithClientId({
 	subscribe: withFilter(
 		() => redisPubSub.asyncIterator(PUB_SUB_EVENTS.TRANSACTION.ADDED),
 		async (payload: TransactionAddedPayload, context) => {
-			console.log(payload);
 			const transaction = await Transaction.findOne({
-				_id: payload.message,
+				_id: payload.id,
 			});
 
 			if (!transaction) {
@@ -27,7 +26,7 @@ const subscription = subscriptionWithClientId({
 		}
 	),
 	getPayload: async (obj: TransactionAddedPayload) => ({
-		message: obj?.message,
+		transaction: obj?.id,
 	}),
 	outputFields: {
 		...transactionField('transaction'),

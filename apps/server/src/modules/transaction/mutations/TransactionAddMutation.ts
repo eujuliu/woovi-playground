@@ -123,7 +123,7 @@ const mutation = mutationWithClientMutationId({
 			await session.endSession();
 
 			redisPubSub.publish(PUB_SUB_EVENTS.TRANSACTION.ADDED, {
-				transaction: transaction._id.toString(),
+				id: transaction._id.toString(),
 			});
 
 			return {

@@ -6,7 +6,7 @@ import { Account } from '../AccountModel';
 import { accountField } from '../accountFields';
 
 type AccountAddedPayload = {
-	message: string;
+	id: string;
 };
 
 const subscription = subscriptionWithClientId({
@@ -15,7 +15,7 @@ const subscription = subscriptionWithClientId({
 		() => redisPubSub.asyncIterator(PUB_SUB_EVENTS.ACCOUNT.ADDED),
 		async (payload: AccountAddedPayload, context) => {
 			const account = await Account.findOne({
-				_id: payload.message,
+				_id: payload.id,
 			});
 
 			if (!account) {
@@ -26,7 +26,7 @@ const subscription = subscriptionWithClientId({
 		}
 	),
 	getPayload: async (obj: AccountAddedPayload) => ({
-		account: obj.message,
+		account: obj?.id,
 	}),
 	outputFields: {
 		...accountField('account'),

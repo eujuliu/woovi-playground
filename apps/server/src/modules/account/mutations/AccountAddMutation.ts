@@ -51,7 +51,7 @@ const mutation = mutationWithClientMutationId({
 			}).save();
 
 			redisPubSub.publish(PUB_SUB_EVENTS.ACCOUNT.ADDED, {
-				account: account._id.toString(),
+				id: account._id.toString(),
 			});
 
 			return { account: account._id.toString() };
