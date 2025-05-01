@@ -17,6 +17,7 @@ const config = {
 	PORT: ENV.PORT ?? 4000,
 	MONGO_URI: ENV.MONGO_URI ?? '',
 	NODE_ENV: ENV.NODE_ENV ?? 'production',
+	REDIS_HOST: ENV.REDIS_HOST ?? '',
 };
 
 export { config };

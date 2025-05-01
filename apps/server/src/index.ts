@@ -7,10 +7,10 @@ import { createGraphqlWs } from './server/createGraphqlWs';
 import { getContext } from './server/getContext';
 import { schema } from './schema/schema';
 
+export const server = http.createServer(app.callback());
+
 (async () => {
 	await connectDatabase();
-
-	const server = http.createServer(app.callback());
 
 	createGraphqlWs(server, '/graphql/ws', {
 		schema,

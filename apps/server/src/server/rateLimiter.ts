@@ -8,8 +8,13 @@ export async function getBucket(id: string) {
 	const data = await redis.hgetall(key);
 	const now = Date.now();
 
-	let tokens = data ? parseFloat(data.tokens) : MAX_TOKENS;
-	let lastUpdated = data ? parseInt(data.lastUpdated) : now;
+	let tokens = MAX_TOKENS;
+	let lastUpdated = now;
+
+	if (data && !isNaN(parseFloat(data.tokens))) {
+		tokens = parseFloat(data.tokens);
+		lastUpdated = parseInt(data.lastUpdated);
+	}
 
 	const elapsed = now - lastUpdated;
 	const regenerated = Math.floor(elapsed / REGENERATION_RATE_MS);
