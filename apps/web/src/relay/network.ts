@@ -75,7 +75,7 @@ async function networkFetch(
 	// property of the response. If any exceptions occurred when processing the request,
 	// throw an error to indicate to the developer what went wrong.
 	if (Array.isArray(json.errors)) {
-		console.error(json);
+		console.error(JSON.parse(json));
 		throw new Error(
 			`Error fetching GraphQL query '${
 				params.name
