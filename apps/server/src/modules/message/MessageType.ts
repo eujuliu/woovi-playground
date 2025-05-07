@@ -4,7 +4,7 @@ import {
 	GraphQLObjectType,
 	GraphQLString,
 } from 'graphql';
-import { connectionDefinitions } from 'graphql-relay';
+import { connectionDefinitions } from '@entria/graphql-mongo-helpers';
 
 import { IMessage } from './MessageModel';
 import { nodeInterface } from '../node/typeRegister';

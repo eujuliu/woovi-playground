@@ -7,7 +7,7 @@ import {
 	GraphQLString,
 } from 'graphql';
 import { ITransaction } from './TransactionModel';
-import { connectionDefinitions } from 'graphql-relay';
+import { connectionDefinitions } from '@entria/graphql-mongo-helpers';
 import { nodeInterface, registerTypeLoader } from '../node/typeRegister';
 import { TransactionLoader } from './TransactionLoader';
 
@@ -31,13 +31,13 @@ const TransactionType = new GraphQLObjectType<ITransaction>({
 			type: TransactionTypeEnum,
 			resolve: (transaction) => transaction.type,
 		},
-		to: {
-			type: GraphQLString,
-			resolve: (transaction) => transaction.to,
-		},
 		from: {
 			type: GraphQLString,
 			resolve: (transaction) => transaction.from,
+		},
+		to: {
+			type: GraphQLString,
+			resolve: (transaction) => transaction.to,
 		},
 		amount: {
 			type: GraphQLInt,

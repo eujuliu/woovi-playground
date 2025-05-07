@@ -1,6 +1,5 @@
 import {
 	GraphQLID,
-	GraphQLInt,
 	GraphQLNonNull,
 	GraphQLObjectType,
 	GraphQLScalarType,
@@ -8,7 +7,7 @@ import {
 	Kind,
 } from 'graphql';
 import { IAccount } from './AccountModel';
-import { connectionDefinitions } from 'graphql-relay';
+import { connectionDefinitions } from '@entria/graphql-mongo-helpers';
 import { nodeInterface, registerTypeLoader } from '../node/typeRegister';
 import { AccountLoader } from './AccountLoader';
 

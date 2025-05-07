@@ -1,4 +1,4 @@
-import { connectionArgs } from 'graphql-relay';
+import { connectionArgs } from '@entria/graphql-mongo-helpers';
 import { TransactionLoader } from './TransactionLoader';
 import { TransactionConnection, TransactionType } from './TransactionType';
 

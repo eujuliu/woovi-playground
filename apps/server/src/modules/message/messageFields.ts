@@ -1,6 +1,6 @@
 import { MessageType, MessageConnection } from './MessageType';
 import { MessageLoader } from './MessageLoader';
-import { connectionArgs } from 'graphql-relay';
+import { connectionArgs } from '@entria/graphql-mongo-helpers';
 
 export const messageField = (key: string) => ({
 	[key]: {

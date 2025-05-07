@@ -1,4 +1,4 @@
-import { connectionArgs } from 'graphql-relay';
+import { connectionArgs } from '@entria/graphql-mongo-helpers';
 import { AccountLoader } from './AccountLoader';
 import { AccountConnection, AccountType } from './AccountType';
 
