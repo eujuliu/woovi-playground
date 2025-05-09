@@ -17,7 +17,6 @@ const mutation = mutationWithClientMutationId({
 			.object({
 				name: z
 					.string()
-					.nonempty()
 					.min(5)
 					.regex(/^[a-zA-Z0-9_]+(?: [a-zA-Z0-9_]+)*$/g),
 			})

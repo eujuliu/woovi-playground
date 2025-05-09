@@ -1,6 +1,6 @@
 import { Suspense, useMemo } from "react";
 import { createEnvironment } from "./environment";
-import { NextPageWithLayout, RelayHydrate } from "./RelayHydrate";
+import { type NextPageWithLayout, RelayHydrate } from "./RelayHydrate";
 import { ReactRelayContext } from "react-relay";
 
 export function ReactRelayContainer<T>({

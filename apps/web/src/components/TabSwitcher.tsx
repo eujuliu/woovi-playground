@@ -17,7 +17,7 @@ export const TabSwitcher = ({ options, active }: Props) => {
 			{options.map(({ id, label, action }) => (
 				<Button
 					variant="ghost"
-					className={`!p-2 h-7 bg-neutral-300 text-neutral-400 cursor-pointer hover:bg-neutral-300 ${active === id ? 'text-neutral-950' : 'bg-neutral-200'}`}
+					className={`!p-2 h-[24px] rounded-sm bg-neutral-300 text-neutral-400 cursor-pointer hover:bg-neutral-300 ${active === id ? 'text-neutral-950' : 'bg-neutral-200'}`}
 					key={id}
 					onClick={() => action(id)}
 				>

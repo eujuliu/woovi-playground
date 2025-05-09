@@ -3,8 +3,8 @@ import { Box, IconButton, TextField } from "@mui/material";
 import { useMutation } from "react-relay";
 import { useState } from "react";
 
-import { MessageAdd } from "./MessageAddMutation";
-import { MessageAddMutation } from "../__generated__/MessageAddMutation.graphql";
+import { MessageAdd } from "../graphql/mutations/MessageAddMutation";
+import type { MessageAddMutation } from "../__generated__/MessageAddMutation.graphql";
 
 type MessageListProps = {
   children?: React.ReactNode;

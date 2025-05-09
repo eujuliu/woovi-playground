@@ -1,33 +1,29 @@
-import { Message } from '../components/Message';
-import { Layout } from '../components/Layout';
-import { MessageList } from '../components/MessageList';
-import { PreloadedQuery, usePreloadedQuery } from 'react-relay';
-import { MessagesQuery as GQLMessageQuery } from '../__generated__/MessagesQuery.graphql';
-import { useMessageAddedSubscription } from '../graphql/subscriptions/useMessageAddedSubscription';
-import { MessagesQuery } from '../graphql/queries/Messages';
+import { Message } from "../components/Message";
+import { MessageList } from "../components/MessageList";
+import { type PreloadedQuery, usePreloadedQuery } from "react-relay";
+import type { MessagesQuery as MessageQueryType } from "../__generated__/MessagesQuery.graphql";
+import { useMessageAddedSubscription } from "../graphql/subscriptions/useMessageAddedSubscription";
+import { MessagesQuery } from "../graphql/queries/Messages";
 
 type Props = {
-	messageQueryRef: PreloadedQuery<GQLMessageQuery>;
+  queryRef: PreloadedQuery<MessageQueryType>;
 };
 
-export const Chat = ({ messageQueryRef }: Props) => {
-	const data = usePreloadedQuery<GQLMessageQuery>(
-		MessagesQuery,
-		messageQueryRef
-	);
+export const Chat = ({ queryRef }: Props) => {
+  const data = usePreloadedQuery<MessageQueryType>(MessagesQuery, queryRef);
 
-	useMessageAddedSubscription({
-		connections: [data.messages?.__id],
-		input: {},
-	});
+  useMessageAddedSubscription({
+    connections: [data.messages?.__id],
+    input: {},
+  });
 
-	return (
-		<Layout>
-			<MessageList>
-				{data.messages.edges.map(({ node }) => (
-					<Message key={node.id} message={node} />
-				))}
-			</MessageList>
-		</Layout>
-	);
+  return (
+    <div className="max-w-[350px] max-h-[600px] w-full">
+      <MessageList>
+        {data.messages.edges.map(({ node }) => (
+          <Message key={node.id} message={node} />
+        ))}
+      </MessageList>
+    </div>
+  );
 };
