@@ -15,16 +15,23 @@ export type IAccount = {
   createdAt: string;
 };
 
+export const AccountFragment = graphql`
+  fragment AccountFragment on Account {
+    id
+    name
+    balance
+    createdAt
+  }
+`;
+
 export const AccountsQueryFragment = graphql`
   fragment AccountsQueryFragment on Query
   @argumentDefinitions(
     first: { type: "Int", defaultValue: 0 }
     after: { type: "String", defaultValue: null }
-    last: { type: "Int", defaultValue: null }
-    before: { type: "String", defaultValue: null }
   )
   @refetchable(queryName: "AccountsRefetchQuery") {
-    accounts(first: $first, after: $after, before: $before, last: $last)
+    accounts(first: $first, after: $after)
       @connection(key: "AccountsQueryFragment_accounts") {
       __id
       edges {
@@ -37,15 +44,6 @@ export const AccountsQueryFragment = graphql`
       }
       totalCount
     }
-  }
-`;
-
-export const AccountFragment = graphql`
-  fragment AccountFragment on Account {
-    id
-    name
-    balance
-    createdAt
   }
 `;
 

@@ -1,9 +1,9 @@
+import { usePreloadedQuery, type PreloadedQuery } from "react-relay";
 import { Message } from "../components/Message";
 import { MessageList } from "../components/MessageList";
-import { type PreloadedQuery, usePreloadedQuery } from "react-relay";
-import type { MessagesQuery as MessageQueryType } from "../__generated__/MessagesQuery.graphql";
-import { useMessageAddedSubscription } from "../graphql/subscriptions/useMessageAddedSubscription";
 import { MessagesQuery } from "../graphql/queries/Messages";
+import { useMessageAddedSubscription } from "../graphql/subscriptions/useMessageAddedSubscription";
+import type { MessagesQuery as MessageQueryType } from "../__generated__/MessagesQuery.graphql";
 
 type Props = {
   queryRef: PreloadedQuery<MessageQueryType>;

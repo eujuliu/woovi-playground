@@ -10,6 +10,11 @@ const subscriptionsClient = IS_SERVER
   ? null
   : createClient({
       url: SUBSCRIPTIONS_ENPOINT,
+      on: {
+        connected: () => console.log("Subscription client connected"),
+        error: (error) => console.error("Subscription client error:", error),
+        closed: () => console.warn("Subscription client closed"),
+      },
     });
 
 // both fetch and subscribe can be handled through one implementation

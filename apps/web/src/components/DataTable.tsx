@@ -8,7 +8,9 @@ import {
   type SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState, useEffect } from "react";
+import type { LoadMoreFn } from "react-relay";
+import type { OperationType } from "relay-runtime";
 import { Button } from "./ui/Button";
 import {
   Table,
@@ -23,8 +25,9 @@ export type DataTableProps<TData, TValue> = {
   data: TData[];
   columns: ColumnDef<TData, TValue>[];
   rowCount: number;
-  loadNext: (count: number, options?: unknown) => void;
+  loadNext: LoadMoreFn<OperationType>;
   loading: boolean;
+  children?: ReactNode;
 };
 
 export const DataTable = <TData, TValue>({
@@ -33,10 +36,11 @@ export const DataTable = <TData, TValue>({
   rowCount,
   loadNext,
   loading,
+  children,
 }: DataTableProps<TData, TValue>) => {
-  const [loadedPages, setLoadedPages] = useState([1]);
   const formattedColumns = useMemo(() => formatColumns(columns), [columns]);
   const [sorting, setSorting] = useState<SortingState>([]);
+
   const table = useReactTable({
     data,
     columns: formattedColumns,
@@ -49,23 +53,6 @@ export const DataTable = <TData, TValue>({
       sorting,
     },
   });
-
-  function handleLoadNext(count: number) {
-    const nextPageIndex = table.getState().pagination.pageIndex + 2;
-
-    if (!loadedPages.includes(nextPageIndex)) {
-      loadNext(count, {
-        onComplete(arg) {
-          setLoadedPages([...loadedPages, nextPageIndex]);
-          setTimeout(() => table.nextPage(), 100);
-        },
-      });
-
-      return;
-    }
-
-    table.nextPage();
-  }
 
   return (
     <div>
@@ -128,7 +115,7 @@ export const DataTable = <TData, TValue>({
           size="sm"
           className="cursor-pointer"
           onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage() || loading}
+          disabled={!table.getCanPreviousPage()}
         >
           Previous
         </Button>
@@ -136,8 +123,22 @@ export const DataTable = <TData, TValue>({
           variant="outline"
           size="sm"
           className="cursor-pointer"
-          onClick={() => handleLoadNext(10)}
-          disabled={!table.getCanNextPage() || loading}
+          onClick={() => {
+            const length = data.length;
+
+            if (rowCount - length > 0) {
+              loadNext(10, {
+                onComplete(arg) {
+                  console.log(arg);
+                  setTimeout(() => table.nextPage(), 100);
+                },
+              });
+
+              return;
+            }
+            table.nextPage();
+          }}
+          disabled={!table.getCanNextPage()}
         >
           Next
         </Button>

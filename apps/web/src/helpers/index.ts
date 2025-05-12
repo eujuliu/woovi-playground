@@ -1,4 +1,4 @@
-export function convertNumberToMoney(value: number) {
+export function convertNumberToMoney(value: string) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",

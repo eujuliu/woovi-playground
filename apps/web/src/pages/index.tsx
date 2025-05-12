@@ -146,8 +146,6 @@ const newTransferFields: FormDialogField[] = [
 ];
 
 const Index = ({ queryRefs }: IndexProps) => {
-  const [accountForm, setAccountForm] = useState<UseFormReturn>(null);
-  const [transactionForm, setTransactionForm] = useState<UseFormReturn>(null);
   const [accountAdd, loadingAccount] =
     useMutation<AccountAddMutation>(AccountAdd);
   const [transactionAdd, loadingTransaction] =
@@ -166,6 +164,7 @@ const Index = ({ queryRefs }: IndexProps) => {
               onSubmit={(
                 values: Omit<IAccount, "id" | "createdAt" | "balance">,
                 form: UseFormReturn,
+                setOpen: (value: boolean) => void,
               ) => {
                 accountAdd({
                   variables: {
@@ -174,6 +173,7 @@ const Index = ({ queryRefs }: IndexProps) => {
                     },
                   },
                   onCompleted() {
+                    setOpen(false);
                     form.reset();
                   },
                   onError() {},
@@ -185,10 +185,10 @@ const Index = ({ queryRefs }: IndexProps) => {
               trigger="New Transfer"
               title="Make a transfer"
               description="This action can't be undone, Click in save when you're done"
-              // onInitForm={(form) => setTransactionForm(form)}
               onSubmit={(
                 values: Omit<ITransaction, "id" | "createdAt">,
                 form: UseFormReturn,
+                setOpen: (value: boolean) => void,
               ) => {
                 transactionAdd({
                   variables: {
@@ -198,6 +198,7 @@ const Index = ({ queryRefs }: IndexProps) => {
                     },
                   },
                   onCompleted() {
+                    setOpen(false);
                     form.reset();
                   },
                   onError() {},
@@ -214,20 +215,20 @@ const Index = ({ queryRefs }: IndexProps) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async () => {
   return {
     props: {
       preloadedQueries: {
         Accounts: await getPreloadedQuery(AccountsQuery, {
-          first: 10,
+          first: 20,
           after: null,
         }),
         Transactions: await getPreloadedQuery(TransactionsQuery, {
-          first: 0,
+          first: 20,
           after: null,
         }),
         Messages: await getPreloadedQuery(MessagesQuery, {
-          first: 0,
+          first: 10,
           after: null,
         }),
       },

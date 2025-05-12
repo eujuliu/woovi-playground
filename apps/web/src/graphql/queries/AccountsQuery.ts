@@ -1,7 +1,7 @@
-import { graphql } from 'relay-runtime';
+import { graphql } from "relay-runtime";
 
 export const AccountsQuery = graphql`
-	query AccountsQuery {
-		...AccountsQueryFragment
-	}
+  query AccountsQuery {
+    ...AccountsQueryFragment
+  }
 `;

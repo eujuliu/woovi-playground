@@ -9,9 +9,7 @@ const AccountAdded = graphql`
       account
         @appendNode(connections: $connections, edgeTypeName: "AccountEdge") {
         id
-        name
-        balance
-        createdAt
+        ...AccountFragment
       }
     }
   }

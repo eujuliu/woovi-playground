@@ -16,6 +16,9 @@ const useMessageAddedSubscription = (
     () => ({
       subscription: MessageAdded,
       variables,
+      onNext(data) {
+        console.log(data);
+      },
     }),
     [variables],
   );

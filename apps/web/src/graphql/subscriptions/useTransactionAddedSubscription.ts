@@ -16,6 +16,9 @@ const useTransactionAddedSubscription = (
     () => ({
       subscription: TransactionAdded,
       variables,
+      onNext(data) {
+        console.log(data);
+      },
     }),
     [variables],
   );

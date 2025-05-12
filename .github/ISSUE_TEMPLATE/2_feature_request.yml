@@ -1,6 +1,6 @@
 name: Sugerir novo recurso
 description: Sugira um novo recurso, funcionalidade ou melhoria.
-labels: ["feature"]
+labels: ["enhancement"]
 body:
   - type: markdown
     attributes:

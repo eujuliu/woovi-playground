@@ -16,6 +16,9 @@ const useAccountAddedSubscription = (
     () => ({
       subscription: AccountAdded,
       variables,
+      onNext(data) {
+        console.log(data);
+      },
     }),
     [variables],
   );

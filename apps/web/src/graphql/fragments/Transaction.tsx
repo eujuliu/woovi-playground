@@ -17,16 +17,25 @@ export type ITransaction = {
   createdAt: string;
 };
 
+export const TransactionFragment = graphql`
+  fragment TransactionFragment on Transaction {
+    id
+    type
+    from
+    to
+    amount
+    createdAt
+  }
+`;
+
 export const TransactionsQueryFragment = graphql`
   fragment TransactionsQueryFragment on Query
   @argumentDefinitions(
-    first: { type: "Int", defaultValue: 0 }
+    first: { type: "Int", defaultValue: 20 }
     after: { type: "String", defaultValue: null }
-    last: { type: "Int", defaultValue: null }
-    before: { type: "String", defaultValue: null }
   )
   @refetchable(queryName: "TransactionsRefetchQuery") {
-    transactions(first: $first, after: $after, before: $before, last: $last)
+    transactions(first: $first, after: $after)
       @connection(key: "TransactionsQueryFragment_transactions") {
       __id
       edges {

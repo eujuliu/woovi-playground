@@ -40,7 +40,11 @@ type FormDialogProps = {
   title: string;
   description: string;
   fields: FormDialogField[];
-  onSubmit: (values: Record<string, unknown>, form: UseFormReturn) => void;
+  onSubmit: (
+    values: Record<string, unknown>,
+    form: UseFormReturn,
+    setOpen: (value: boolean) => void,
+  ) => void;
   onOpenChange?: (open: boolean) => void;
 };
 
@@ -92,7 +96,9 @@ export const FormDialog = ({
         <DialogDescription>{description}</DialogDescription>
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit((data) => onSubmit(data, form))}
+            onSubmit={form.handleSubmit((data) =>
+              onSubmit(data, form, setOpen),
+            )}
             className="flex flex-col space-y-8"
           >
             {fields.map(({ id, label, description, Control }) => (
