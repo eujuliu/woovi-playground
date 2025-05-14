@@ -9,6 +9,7 @@ import { TransactionAdded } from "./TransactionAddedSubscription";
 
 const useTransactionAddedSubscription = (
   variables: TransactionAddedSubscription$variables,
+  options?: Partial<GraphQLSubscriptionConfig<TransactionAddedSubscription>>,
 ) => {
   const newTransactionConfig = useMemo<
     GraphQLSubscriptionConfig<TransactionAddedSubscription>
@@ -16,11 +17,9 @@ const useTransactionAddedSubscription = (
     () => ({
       subscription: TransactionAdded,
       variables,
-      onNext(data) {
-        console.log(data);
-      },
+      ...options,
     }),
-    [variables],
+    [variables, options],
   );
 
   useSubscription(newTransactionConfig);

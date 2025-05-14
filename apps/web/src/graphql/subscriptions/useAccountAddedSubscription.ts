@@ -9,6 +9,7 @@ import { AccountAdded } from "./AccountAddedSubscription";
 
 const useAccountAddedSubscription = (
   variables: AccountAddedSubscription$variables,
+  options?: Partial<GraphQLSubscriptionConfig<AccountAddedSubscription>>,
 ) => {
   const newAccountConfig = useMemo<
     GraphQLSubscriptionConfig<AccountAddedSubscription>
@@ -16,11 +17,9 @@ const useAccountAddedSubscription = (
     () => ({
       subscription: AccountAdded,
       variables,
-      onNext(data) {
-        console.log(data);
-      },
+      ...options,
     }),
-    [variables],
+    [variables, options],
   );
 
   useSubscription(newAccountConfig);

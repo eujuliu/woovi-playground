@@ -1,6 +1,5 @@
 import type { GetServerSideProps } from "next";
 
-import { Chat } from "@/components/Chat";
 import { Input } from "@/components/ui/Input";
 import { FormDialog, type FormDialogField } from "@/components/FormDialog";
 import { HomePageDataTable } from "@/components/HomePageDataTable";
@@ -32,6 +31,13 @@ import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useMutation, type PreloadedQuery } from "react-relay";
 import { z } from "zod";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/Select";
 
 type IndexProps = {
   queryRefs: {
@@ -65,15 +71,36 @@ const createAccountFields: FormDialogField[] = [
 
 const newTransferFields: FormDialogField[] = [
   {
+    id: "type",
+    label: "Type",
+    description: "This is the type of the transaction",
+    defaultValue: "TRANSFER",
+    Control: (field) => (
+      <Select
+        onValueChange={(value) => field.onChange(value)}
+        defaultValue={field.value as string}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Transfer type" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="DEPOSIT">Deposit</SelectItem>
+          <SelectItem value="TRANSFER">Transfer</SelectItem>
+        </SelectContent>
+      </Select>
+    ),
+    schema: z.string().nonempty(),
+  },
+  {
     id: "from",
     label: "From",
     description: "This is the account that will send the amount",
     defaultValue: "",
-    Control: (field) => (
+    Control: (field, form) => (
       <Input
         placeholder="Type the account ID"
         onChange={field.onChange}
-        value={field.value}
+        value={field.value as string}
       />
     ),
     schema: z
@@ -192,10 +219,7 @@ const Index = ({ queryRefs }: IndexProps) => {
               ) => {
                 transactionAdd({
                   variables: {
-                    input: {
-                      ...values,
-                      type: "TRANSFER",
-                    },
+                    input: values,
                   },
                   onCompleted() {
                     setOpen(false);

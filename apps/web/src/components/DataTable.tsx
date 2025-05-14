@@ -1,16 +1,9 @@
-import formatColumns from "@/utils/formatColumns";
-import {
-  type ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  type SortingState,
-  useReactTable,
-} from "@tanstack/react-table";
-import { type ReactNode, useMemo, useState, useEffect } from "react";
+import { chunkArray, sortByKey, type SortType } from "@/helpers";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import { type ReactNode, useState } from "react";
 import type { LoadMoreFn } from "react-relay";
 import type { OperationType } from "relay-runtime";
+import { DataTableRow } from "./DataTableRow";
 import { Button } from "./ui/Button";
 import {
   Table,
@@ -21,77 +14,98 @@ import {
   TableRow,
 } from "./ui/Table";
 
-export type DataTableProps<TData, TValue> = {
-  data: TData[];
-  columns: ColumnDef<TData, TValue>[];
-  rowCount: number;
-  loadNext: LoadMoreFn<OperationType>;
-  loading: boolean;
-  children?: ReactNode;
+export type Data = {
+  id: string;
+  [key: string]: unknown;
 };
 
-export const DataTable = <TData, TValue>({
-  data,
+export type Column<T> = {
+  id: string;
+  accessorKey?: string;
+  order?: number;
+  header?: string;
+  canSort: boolean;
+  cell: (data: T) => ReactNode;
+};
+
+export type Sorting = {
+  type: SortType;
+  column: string;
+};
+
+export type DataTableProps<T> = {
+  data: T[];
+  columns: Column<T>[];
+  rowCount: number;
+  loadNext: LoadMoreFn<OperationType>;
+  fragment: any;
+};
+
+export const DataTable = <T extends Data>({
+  data: raw,
   columns,
   rowCount,
   loadNext,
-  loading,
-  children,
-}: DataTableProps<TData, TValue>) => {
-  const formattedColumns = useMemo(() => formatColumns(columns), [columns]);
-  const [sorting, setSorting] = useState<SortingState>([]);
-
-  const table = useReactTable({
-    data,
-    columns: formattedColumns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    rowCount,
-    state: {
-      sorting,
-    },
+  fragment,
+}: DataTableProps<T>) => {
+  const [sorting, setSorting] = useState<Sorting>({
+    column: "createdAt",
+    type: "dec",
   });
+  const [pageIndex, setPageIndex] = useState(0);
+  const itemsPerPage = 10;
+  const pagesCount = Math.round(rowCount / itemsPerPage);
+  const chunks = chunkArray(
+    sortByKey(raw, sorting.column, sorting.type as "asc" | "dec"),
+  );
+  const data = chunks[pageIndex];
+
+  function sortArrow(active: boolean, type: "asc" | "dec") {
+    if (!active) return <ArrowUpDown className="ml-2 h-2 w-2" />;
+
+    if (type === "asc") return <ArrowUp className="ml-2 h-2 w-2" />;
+
+    return <ArrowDown className="ml-2 h-2 w-2" />;
+  }
 
   return (
     <div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
+            <TableRow>
+              {columns.map((column) => (
+                <TableHead key={column.id}>
+                  {column.canSort ? (
+                    <Button
+                      variant="ghost"
+                      className={`text-xs font-medium cursor-pointer hover:bg-blue-200 h-7 ${sorting.column === column.id ? "bg-blue-100" : ""}`}
+                      onClick={() =>
+                        setSorting({
+                          column: column.id,
+                          type: sorting.type === "asc" ? "dec" : "asc",
+                        })
+                      }
+                    >
+                      {column.header}
+                      {sortArrow(sorting.column === column.id, sorting.type)}
+                    </Button>
+                  ) : (
+                    <div className="text-xs font-medium">{column.header}</div>
+                  )}
+                </TableHead>
+              ))}
+            </TableRow>
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
+            {data.length ? (
+              data.map((row) => (
+                <DataTableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                  fragment={fragment}
+                  node={row}
+                  columns={columns}
+                />
               ))
             ) : (
               <TableRow>
@@ -107,15 +121,16 @@ export const DataTable = <TData, TValue>({
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
+        <span className="text-sm text-neutral-800">Count {rowCount}</span>
         <span className="text-sm text-neutral-800">
-          {`Page ${table.getState().pagination.pageIndex + 1} of ${table.getPageCount()}`}
+          {`Page ${pageIndex + 1} of ${pagesCount}`}
         </span>
         <Button
           variant="outline"
           size="sm"
           className="cursor-pointer"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
+          onClick={() => setPageIndex(pageIndex - 1)}
+          disabled={pageIndex === 0}
         >
           Previous
         </Button>
@@ -124,21 +139,16 @@ export const DataTable = <TData, TValue>({
           size="sm"
           className="cursor-pointer"
           onClick={() => {
-            const length = data.length;
+            if (chunks.length - 1 >= pageIndex + 1)
+              return setPageIndex(pageIndex + 1);
 
-            if (rowCount - length > 0) {
-              loadNext(10, {
-                onComplete(arg) {
-                  console.log(arg);
-                  setTimeout(() => table.nextPage(), 100);
-                },
-              });
-
-              return;
-            }
-            table.nextPage();
+            loadNext(10, {
+              onComplete() {
+                setPageIndex(pageIndex + 1);
+              },
+            });
           }}
-          disabled={!table.getCanNextPage()}
+          disabled={pageIndex === pagesCount - 1}
         >
           Next
         </Button>

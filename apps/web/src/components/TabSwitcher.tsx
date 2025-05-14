@@ -1,29 +1,34 @@
-import { Button } from './ui/Button';
+import { Button } from "./ui/Button";
 
 export type Option = {
-	id: string;
-	label: string;
-	action: (id: string) => void;
+  id: string;
+  label: string;
+  action: (id: string) => void;
 };
 
 type Props = {
-	options: Option[];
-	active: string;
+  options: Option[];
+  active: string;
+  onChange?: (option: Option) => void;
 };
 
-export const TabSwitcher = ({ options, active }: Props) => {
-	return (
-		<div className="flex gap-1 bg-neutral-200 rounded-lg w-fit p-1">
-			{options.map(({ id, label, action }) => (
-				<Button
-					variant="ghost"
-					className={`!p-2 h-[24px] rounded-sm bg-neutral-300 text-neutral-400 cursor-pointer hover:bg-neutral-300 ${active === id ? 'text-neutral-950' : 'bg-neutral-200'}`}
-					key={id}
-					onClick={() => action(id)}
-				>
-					{label}
-				</Button>
-			))}
-		</div>
-	);
+export const TabSwitcher = ({ options, active, onChange }: Props) => {
+  return (
+    <div className="flex gap-1 bg-neutral-200 rounded-lg w-fit p-1">
+      {options.map(({ id, label, action }) => (
+        <Button
+          variant="ghost"
+          className={`!p-2 h-[24px] rounded-sm bg-neutral-300 text-neutral-400 cursor-pointer hover:bg-neutral-300 ${active === id ? "text-neutral-950" : "bg-neutral-200"}`}
+          key={id}
+          onClick={() => {
+            action(id);
+
+            if (onChange) onChange({ id, label, action });
+          }}
+        >
+          {label}
+        </Button>
+      ))}
+    </div>
+  );
 };

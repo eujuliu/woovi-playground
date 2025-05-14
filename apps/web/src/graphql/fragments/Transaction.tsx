@@ -7,6 +7,7 @@ import { getColumn } from "@/utils/getColumn";
 import type { ColumnDef } from "@tanstack/react-table";
 import { graphql } from "relay-runtime";
 import { convertNumberToMoney } from "@/helpers";
+import { Column } from "@/components/DataTable";
 
 export type ITransaction = {
   id: string;
@@ -31,7 +32,7 @@ export const TransactionFragment = graphql`
 export const TransactionsQueryFragment = graphql`
   fragment TransactionsQueryFragment on Query
   @argumentDefinitions(
-    first: { type: "Int", defaultValue: 20 }
+    first: { type: "Int", defaultValue: 10 }
     after: { type: "String", defaultValue: null }
   )
   @refetchable(queryName: "TransactionsRefetchQuery") {
@@ -46,6 +47,7 @@ export const TransactionsQueryFragment = graphql`
           to
           amount
           createdAt
+          ...TransactionFragment
         }
       }
       totalCount
@@ -53,53 +55,74 @@ export const TransactionsQueryFragment = graphql`
   }
 `;
 
-export const columns: ColumnDef<ITransaction>[] = [
-  getColumn("id"),
+export const columns: Column<ITransaction>[] = [
+  {
+    id: "id",
+    accessorKey: "id",
+    canSort: false,
+    header: "ID",
+    cell: (data) => (
+      <button
+        type="button"
+        className="bg-neutral-200 rounded-md px-1 font-medium"
+        title="Copy Id"
+        onClick={() => navigator.clipboard.writeText(data.id)}
+      >
+        {data.id}
+      </button>
+    ),
+  },
   {
     id: "type",
     accessorKey: "type",
+    canSort: true,
     header: "Type",
+    cell: (data) => data.type,
   },
   {
     id: "from",
     accessorKey: "from",
+    canSort: true,
     header: "From",
+    cell: (data) => (
+      <button
+        type="button"
+        className="bg-neutral-200 rounded-md px-1 font-medium"
+        title="Copy Id"
+        onClick={() => navigator.clipboard.writeText(data.from)}
+      >
+        {data.from}
+      </button>
+    ),
   },
   {
     id: "to",
     accessorKey: "to",
+    canSort: true,
     header: "To",
+    cell: (data) => (
+      <button
+        type="button"
+        className="bg-neutral-200 rounded-md px-1 font-medium"
+        title="Copy Id"
+        onClick={() => navigator.clipboard.writeText(data.to)}
+      >
+        {data.to}
+      </button>
+    ),
   },
   {
     id: "amount",
     accessorKey: "amount",
+    canSort: true,
     header: "Amount",
-    cell: ({ row }) => <>{convertNumberToMoney(row.getValue("amount"))}</>,
+    cell: (data) => convertNumberToMoney(data.amount.toString()),
   },
-  getColumn("date", {
+  {
     id: "createdAt",
     accessorKey: "createdAt",
+    canSort: true,
     header: "Created At",
-  }),
-  getColumn("actions", null, (row) => (
-    <>
-      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-      <DropdownMenuItem
-        onClick={() => navigator.clipboard.writeText(row.original.id)}
-      >
-        Copy Transaction ID
-      </DropdownMenuItem>
-      <DropdownMenuSeparator />
-      <DropdownMenuItem
-        onClick={() => navigator.clipboard.writeText(row.original.from)}
-      >
-        Copy Sender ID
-      </DropdownMenuItem>
-      <DropdownMenuItem
-        onClick={() => navigator.clipboard.writeText(row.original.to)}
-      >
-        Copy Receiver ID
-      </DropdownMenuItem>
-    </>
-  )),
+    cell: (data) => data.createdAt,
+  },
 ];

@@ -32,6 +32,7 @@ export type FormDialogField = {
   defaultValue: unknown;
   Control: (
     field: ControllerRenderProps<Record<string, unknown>, string>,
+    form?: UseFormReturn,
   ) => ReactNode;
 };
 
@@ -109,7 +110,7 @@ export const FormDialog = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{label}</FormLabel>
-                    <FormControl>{Control(field)}</FormControl>
+                    <FormControl>{Control(field, form)}</FormControl>
                     <FormDescription className="text-xs">
                       {description}
                     </FormDescription>

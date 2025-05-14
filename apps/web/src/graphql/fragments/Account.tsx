@@ -7,6 +7,7 @@ import { getColumn } from "@/utils/getColumn";
 import type { ColumnDef } from "@tanstack/react-table";
 import { graphql } from "relay-runtime";
 import { convertNumberToMoney } from "@/helpers";
+import { Column } from "@/components/DataTable";
 
 export type IAccount = {
   id: string;
@@ -27,7 +28,7 @@ export const AccountFragment = graphql`
 export const AccountsQueryFragment = graphql`
   fragment AccountsQueryFragment on Query
   @argumentDefinitions(
-    first: { type: "Int", defaultValue: 0 }
+    first: { type: "Int", defaultValue: 10 }
     after: { type: "String", defaultValue: null }
   )
   @refetchable(queryName: "AccountsRefetchQuery") {
@@ -40,6 +41,7 @@ export const AccountsQueryFragment = graphql`
           name
           balance
           createdAt
+          ...AccountFragment
         }
       }
       totalCount
@@ -47,35 +49,42 @@ export const AccountsQueryFragment = graphql`
   }
 `;
 
-export const columns: ColumnDef<IAccount>[] = [
-  getColumn("id"),
+export const columns: Column<IAccount>[] = [
+  {
+    id: "id",
+    accessorKey: "id",
+    canSort: false,
+    header: "ID",
+    cell: (data) => (
+      <button
+        type="button"
+        className="bg-neutral-200 rounded-md px-1 font-medium"
+        title="Copy Id"
+        onClick={() => navigator.clipboard.writeText(data.id)}
+      >
+        {data.id}
+      </button>
+    ),
+  },
   {
     id: "name",
     accessorKey: "name",
+    canSort: true,
     header: "Name",
+    cell: (data) => data.name,
   },
   {
     id: "balance",
     accessorKey: "balance",
+    canSort: true,
     header: "Balance",
-    cell: ({ row }) => <>{convertNumberToMoney(row.getValue("balance"))}</>,
+    cell: (data) => convertNumberToMoney(data.balance),
   },
-  getColumn("date", {
+  {
     id: "createdAt",
     accessorKey: "createdAt",
+    canSort: true,
     header: "Created At",
-  }),
-  getColumn("actions", null, (row) => (
-    <>
-      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-      <DropdownMenuItem
-        onClick={() => navigator.clipboard.writeText(row.original.id)}
-      >
-        Copy Account ID
-      </DropdownMenuItem>
-      <DropdownMenuSeparator />
-      <DropdownMenuItem>Deposit</DropdownMenuItem>
-      <DropdownMenuItem>Transactions</DropdownMenuItem>
-    </>
-  )),
+    cell: (data) => data.createdAt,
+  },
 ];

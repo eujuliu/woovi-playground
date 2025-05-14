@@ -1,4 +1,3 @@
-import { Box, Card, Typography } from "@mui/material";
 import { useFragment } from "react-relay";
 import { DateTime } from "luxon";
 
@@ -17,20 +16,17 @@ export const Message = (props: MessageProps) => {
   );
 
   return (
-    <Card
-      variant="outlined"
-      sx={{ display: "flex", flexDirection: "column", p: 2, gap: 2 }}
-    >
-      <Box sx={{ display: "flex", gap: 1 }}>
+    <div className="flex flex-col p-2 gap-2">
+      <div className="flex gap-1">
         <WooviAvatar />
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          <Typography fontWeight={500}>Woovi Playground</Typography>
-          <Typography variant="body2">
+        <div className="flex flex-col">
+          <p className="font-medium">Woovi Playground</p>
+          <p className="font-xs">
             {DateTime.fromISO(message.createdAt).toFormat("dd/MM/yyyy HH:mm")}
-          </Typography>
-        </Box>
-      </Box>
-      <Typography variant="body2">{message.content}</Typography>
-    </Card>
+          </p>
+        </div>
+        <p>{message.content}</p>
+      </div>
+    </div>
   );
 };
