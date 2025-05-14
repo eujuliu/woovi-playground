@@ -1,0 +1,158 @@
+import { chunkArray, sortByKey, type SortType } from "@/helpers";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import { type ReactNode, useState } from "react";
+import type { LoadMoreFn } from "react-relay";
+import type { OperationType } from "relay-runtime";
+import { DataTableRow } from "./DataTableRow";
+import { Button } from "./ui/Button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./ui/Table";
+
+export type Data = {
+  id: string;
+  [key: string]: unknown;
+};
+
+export type Column<T> = {
+  id: string;
+  accessorKey?: string;
+  order?: number;
+  header?: string;
+  canSort: boolean;
+  cell: (data: T) => ReactNode;
+};
+
+export type Sorting = {
+  type: SortType;
+  column: string;
+};
+
+export type DataTableProps<T> = {
+  data: T[];
+  columns: Column<T>[];
+  rowCount: number;
+  loadNext: LoadMoreFn<OperationType>;
+  fragment: any;
+};
+
+export const DataTable = <T extends Data>({
+  data: raw,
+  columns,
+  rowCount,
+  loadNext,
+  fragment,
+}: DataTableProps<T>) => {
+  const [sorting, setSorting] = useState<Sorting>({
+    column: "createdAt",
+    type: "dec",
+  });
+  const [pageIndex, setPageIndex] = useState(0);
+  const itemsPerPage = 10;
+  const pagesCount = Math.round(rowCount / itemsPerPage);
+  const chunks = chunkArray(
+    sortByKey(raw, sorting.column, sorting.type as "asc" | "dec"),
+  );
+  const data = chunks[pageIndex];
+
+  function sortArrow(active: boolean, type: "asc" | "dec") {
+    if (!active) return <ArrowUpDown className="ml-2 h-2 w-2" />;
+
+    if (type === "asc") return <ArrowUp className="ml-2 h-2 w-2" />;
+
+    return <ArrowDown className="ml-2 h-2 w-2" />;
+  }
+
+  return (
+    <div>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {columns.map((column) => (
+                <TableHead key={column.id}>
+                  {column.canSort ? (
+                    <Button
+                      variant="ghost"
+                      className={`text-xs font-medium cursor-pointer hover:bg-blue-200 h-7 ${sorting.column === column.id ? "bg-blue-100" : ""}`}
+                      onClick={() =>
+                        setSorting({
+                          column: column.id,
+                          type: sorting.type === "asc" ? "dec" : "asc",
+                        })
+                      }
+                    >
+                      {column.header}
+                      {sortArrow(sorting.column === column.id, sorting.type)}
+                    </Button>
+                  ) : (
+                    <div className="text-xs font-medium">{column.header}</div>
+                  )}
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.length ? (
+              data.map((row) => (
+                <DataTableRow
+                  key={row.id}
+                  fragment={fragment}
+                  node={row}
+                  columns={columns}
+                />
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <span className="text-sm text-neutral-800">Count {rowCount}</span>
+        <span className="text-sm text-neutral-800">
+          {`Page ${pageIndex + 1} of ${pagesCount}`}
+        </span>
+        <Button
+          variant="outline"
+          size="sm"
+          className="cursor-pointer"
+          onClick={() => setPageIndex(pageIndex - 1)}
+          disabled={pageIndex === 0}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="cursor-pointer"
+          onClick={() => {
+            if (chunks.length - 1 >= pageIndex + 1)
+              return setPageIndex(pageIndex + 1);
+
+            loadNext(10, {
+              onComplete() {
+                setPageIndex(pageIndex + 1);
+              },
+            });
+          }}
+          disabled={pageIndex === pagesCount - 1}
+        >
+          Next
+        </Button>
+      </div>
+    </div>
+  );
+};

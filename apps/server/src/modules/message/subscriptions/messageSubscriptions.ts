@@ -1,5 +1,5 @@
-import { MessageAddedSubscription } from './MessageAddedSubscription';
+import { MessageAddedSubscription } from "./MessageAddedSubscription";
 
 export const messageSubscriptions = {
-	MessageAdded: MessageAddedSubscription,
+  MessageAdded: MessageAddedSubscription,
 };

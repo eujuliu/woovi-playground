@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { Server as WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 import { schema } from '../schema/schema';
@@ -62,7 +63,7 @@ export const createGraphqlWs = (
 	);
 
 	server.on('upgrade', function upgrade(request, socket, head) {
-		const { pathname } = urlParse(request.url);
+		const { pathname } = urlParse(request.url as string);
 
 		if (pathname === path) {
 			wss.handleUpgrade(request, socket, head, function done(ws) {

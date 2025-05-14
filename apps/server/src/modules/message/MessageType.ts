@@ -1,6 +1,10 @@
-import { GraphQLObjectType, GraphQLString, GraphQLNonNull } from 'graphql';
-import { globalIdField, connectionDefinitions } from 'graphql-relay';
-import type { ConnectionArguments } from 'graphql-relay';
+import {
+	GraphQLID,
+	GraphQLNonNull,
+	GraphQLObjectType,
+	GraphQLString,
+} from 'graphql';
+import { connectionDefinitions } from '@entria/graphql-mongo-helpers';
 
 import { IMessage } from './MessageModel';
 import { nodeInterface } from '../node/typeRegister';
@@ -11,7 +15,10 @@ const MessageType = new GraphQLObjectType<IMessage>({
 	name: 'Message',
 	description: 'Represents a message',
 	fields: () => ({
-		id: globalIdField('Message'),
+		id: {
+			type: new GraphQLNonNull(GraphQLID),
+			resolve: (message) => message._id.toString(),
+		},
 		content: {
 			type: GraphQLString,
 			resolve: (message) => message.content,

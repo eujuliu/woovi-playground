@@ -1,5 +1,5 @@
-import { MessageAddMutation } from './MessageAddMutation';
+import { MessageAddMutation } from "./MessageAddMutation";
 
 export const messageMutations = {
-	MessageAdd: MessageAddMutation,
+  MessageAdd: MessageAddMutation,
 };

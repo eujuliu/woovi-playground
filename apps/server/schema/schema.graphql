@@ -1,26 +1,56 @@
 type Query {
-  messages(
-    """Returns the items in the list that come after the specified cursor."""
-    after: String
-
-    """Returns the first n items from the list."""
-    first: Int
-
-    """Returns the items in the list that come before the specified cursor."""
-    before: String
-
-    """Returns the last n items from the list."""
-    last: Int
-  ): MessageConnection
+  messages(after: String, first: Int, before: String, last: Int): MessageConnection
+  accounts(after: String, first: Int, before: String, last: Int): AccountConnection
+  transactions(after: String, first: Int, before: String, last: Int): TransactionConnection
 }
 
 """A connection to a list of items."""
-type MessageConnection {
+type MessageConnection implements Connection {
+  """Number of items in this connection."""
+  count: Int
+
+  """
+  A count of the total number of objects in this connection, ignoring pagination.
+  This allows a client to fetch the first five objects by passing "5" as the
+  argument to "first", then fetch the total count so it could display "5 of 83",
+  for example.
+  """
+  totalCount: Int
+
+  """Offset from start."""
+  startCursorOffset: Int!
+
+  """Offset till end."""
+  endCursorOffset: Int!
+
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
   """A list of edges."""
-  edges: [MessageEdge]
+  edges: [MessageEdge]!
+}
+
+"""A connection to a list of items."""
+interface Connection {
+  """Number of items in this connection."""
+  count: Int
+
+  """
+  A count of the total number of objects in this connection, ignoring pagination.
+  This allows a client to fetch the first five objects by passing "5" as the
+  argument to "first", then fetch the total count so it could display "5 of 83",
+  for example.
+  """
+  totalCount: Int
+
+  """Offset from start."""
+  startCursorOffset: Int!
+
+  """Offset till end."""
+  endCursorOffset: Int!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
 }
 
 """Information about pagination in a connection."""
@@ -40,16 +70,15 @@ type PageInfo {
 
 """An edge in a connection."""
 type MessageEdge {
-  """The item at the end of the edge"""
+  """The item at the end of the edge."""
   node: Message
 
-  """A cursor for use in pagination"""
+  """A cursor for use in pagination."""
   cursor: String!
 }
 
 """Represents a message"""
 type Message implements Node {
-  """The ID of an object"""
   id: ID!
   content: String
   createdAt: String
@@ -61,8 +90,106 @@ interface Node {
   id: ID!
 }
 
+"""A connection to a list of items."""
+type AccountConnection implements Connection {
+  """Number of items in this connection."""
+  count: Int
+
+  """
+  A count of the total number of objects in this connection, ignoring pagination.
+  This allows a client to fetch the first five objects by passing "5" as the
+  argument to "first", then fetch the total count so it could display "5 of 83",
+  for example.
+  """
+  totalCount: Int
+
+  """Offset from start."""
+  startCursorOffset: Int!
+
+  """Offset till end."""
+  endCursorOffset: Int!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [AccountEdge]!
+}
+
+"""An edge in a connection."""
+type AccountEdge {
+  """The item at the end of the edge."""
+  node: Account
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""Represents an account"""
+type Account implements Node {
+  id: ID!
+  name: String
+  balance: Long
+  createdAt: String
+}
+
+"""A custom scalar to handle 64-bit integers"""
+scalar Long
+
+"""A connection to a list of items."""
+type TransactionConnection implements Connection {
+  """Number of items in this connection."""
+  count: Int
+
+  """
+  A count of the total number of objects in this connection, ignoring pagination.
+  This allows a client to fetch the first five objects by passing "5" as the
+  argument to "first", then fetch the total count so it could display "5 of 83",
+  for example.
+  """
+  totalCount: Int
+
+  """Offset from start."""
+  startCursorOffset: Int!
+
+  """Offset till end."""
+  endCursorOffset: Int!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [TransactionEdge]!
+}
+
+"""An edge in a connection."""
+type TransactionEdge {
+  """The item at the end of the edge."""
+  node: Transaction
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""Represents a transaction"""
+type Transaction implements Node {
+  id: ID!
+  type: TransactionTypeEnum
+  to: String
+  from: String
+  amount: Int
+  createdAt: String
+}
+
+enum TransactionTypeEnum {
+  DEPOSIT
+  TRANSFER
+}
+
 type Mutation {
   MessageAdd(input: MessageAddInput!): MessageAddPayload
+  AccountAdd(input: AccountAddInput!): AccountAddPayload
+  TransactionAdd(input: TransactionAddInput!): TransactionAddPayload
 }
 
 type MessageAddPayload {
@@ -75,8 +202,33 @@ input MessageAddInput {
   clientMutationId: String
 }
 
+type AccountAddPayload {
+  account: Account
+  clientMutationId: String
+}
+
+input AccountAddInput {
+  name: String!
+  clientMutationId: String
+}
+
+type TransactionAddPayload {
+  transaction: Transaction
+  clientMutationId: String
+}
+
+input TransactionAddInput {
+  type: TransactionTypeEnum!
+  from: String!
+  to: String!
+  amount: Int!
+  clientMutationId: String
+}
+
 type Subscription {
   MessageAdded(input: MessageAddedInput!): MessageAddedPayload
+  AccountAdded(input: AccountAddedInput!): AccountAddedPayload
+  TransactionAdded(input: TransactionAddedInput!): TransactionAddedPayload
 }
 
 type MessageAddedPayload {
@@ -85,5 +237,23 @@ type MessageAddedPayload {
 }
 
 input MessageAddedInput {
+  clientSubscriptionId: String
+}
+
+type AccountAddedPayload {
+  account: Account
+  clientSubscriptionId: String
+}
+
+input AccountAddedInput {
+  clientSubscriptionId: String
+}
+
+type TransactionAddedPayload {
+  transaction: Transaction
+  clientSubscriptionId: String
+}
+
+input TransactionAddedInput {
   clientSubscriptionId: String
 }
