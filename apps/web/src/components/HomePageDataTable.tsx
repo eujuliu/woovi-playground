@@ -1,6 +1,7 @@
 import {
   usePaginationFragment,
   usePreloadedQuery,
+  type GraphQLTaggedNode,
   type PreloadedQuery,
 } from "react-relay";
 
@@ -8,21 +9,33 @@ import {
   AccountFragment,
   AccountsQueryFragment,
   columns as accountsColumns,
+  type IAccount,
 } from "@/graphql/fragments/Account";
 import {
   columns as transactionsColumns,
   TransactionFragment,
   TransactionsQueryFragment,
+  type ITransaction,
 } from "@/graphql/fragments/Transaction";
-import type { AccountsQuery as AccountsQueryType } from "@/__generated__/AccountsQuery.graphql";
-import type { TransactionsQuery as TransactionsQueryType } from "@/__generated__/TransactionsQuery.graphql";
-import { useReducer, useState } from "react";
-import { TabSwitcher, type Option } from "./TabSwitcher";
 import { AccountsQuery } from "@/graphql/queries/AccountsQuery";
 import { TransactionsQuery } from "@/graphql/queries/Transactions";
-import { DataTable } from "./DataTable";
 import { useAccountAddedSubscription } from "@/graphql/subscriptions/useAccountAddedSubscription";
 import { useTransactionAddedSubscription } from "@/graphql/subscriptions/useTransactionAddedSubscription";
+import type {
+  AccountsQuery as AccountsQueryType,
+  AccountsQuery$data,
+} from "@/__generated__/AccountsQuery.graphql";
+import type {
+  TransactionsQuery as TransactionsQueryType,
+  TransactionsQuery$data,
+} from "@/__generated__/TransactionsQuery.graphql";
+import { useState } from "react";
+import type { usePaginationFragmentHookType } from "react-relay/relay-hooks/usePaginationFragment";
+import { DataTable, type Column } from "./DataTable";
+import { TabSwitcher, type Option } from "./TabSwitcher";
+import { Refresh } from "./ui/Refresh";
+import { toast } from "sonner";
+import { DateTime } from "luxon";
 
 type HomePageDataTableProps = {
   queryRefs: {
@@ -31,19 +44,32 @@ type HomePageDataTableProps = {
   };
 };
 
-export const HomePageDataTable = ({ queryRefs }: HomePageDataTableProps) => {
-  const [menu, setMenu] = useState("Accounts");
-  const options: Option[] = [
-    { id: "Accounts", label: "Accounts", action: (id) => setMenu(id) },
-    { id: "Transactions", label: "Transactions", action: (id) => setMenu(id) },
-  ];
-  const [newItems, setNewItems] = useState({ Accounts: 0, Transctions: 0 });
+type State = {
+  __id: string;
+  data: AccountsQuery$data | TransactionsQuery$data[];
+  rowCount: number;
+  columns: Column<IAccount | ITransaction>[];
+  fragment: GraphQLTaggedNode;
+} & usePaginationFragmentHookType<any, any, any>;
 
-  const preloadedAccountQuery = usePreloadedQuery(
+type Menus = "Accounts" | "Transactions";
+
+export const HomePageDataTable = ({ queryRefs }: HomePageDataTableProps) => {
+  const [menu, setMenu] = useState<Menus>("Accounts");
+  const options: Option[] = [
+    { id: "Accounts", label: "Accounts", action: (id) => setMenu(id as Menus) },
+    {
+      id: "Transactions",
+      label: "Transactions",
+      action: (id) => setMenu(id as Menus),
+    },
+  ];
+
+  const preloadedAccountQuery = usePreloadedQuery<AccountsQueryType>(
     AccountsQuery,
     queryRefs.Accounts,
   );
-  const preloadedTransactionQuery = usePreloadedQuery(
+  const preloadedTransactionQuery = usePreloadedQuery<TransactionsQueryType>(
     TransactionsQuery,
     queryRefs.Transactions,
   );
@@ -58,7 +84,8 @@ export const HomePageDataTable = ({ queryRefs }: HomePageDataTableProps) => {
 
   const accounts = rawAccounts.accounts;
   const transactions = rawTransactions.transactions;
-  const state = {
+
+  const state: Record<"Accounts" | "Transactions", State> = {
     Accounts: {
       __id: accounts.__id,
       data: accounts.edges.map(({ node }) => node),
@@ -84,7 +111,10 @@ export const HomePageDataTable = ({ queryRefs }: HomePageDataTableProps) => {
     },
     {
       onNext(data) {
-        setNewItems({ ...newItems, Accounts: newItems.Accounts + 1 });
+        const account = data.AccountAdded.account;
+        toast("Account added", {
+          description: `Account ${account.id} created at ${DateTime.fromISO(account.createdAt).toFormat("dd/MM/yyyy HH:mm")}`,
+        });
       },
     },
   );
@@ -96,21 +126,38 @@ export const HomePageDataTable = ({ queryRefs }: HomePageDataTableProps) => {
     },
     {
       onNext(data) {
-        setNewItems({ ...newItems, Transctions: newItems.Transctions + 1 });
+        const transaction = data.TransactionAdded.transaction;
+        toast("Transaction added", {
+          description: `New ${transaction.type} from ${transaction.from} to ${transaction.to} at ${DateTime.fromISO(transaction.createdAt).toFormat("dd/MM/yyyy HH:mm")}`,
+        });
       },
     },
   );
 
   return (
     <div className="flex flex-col gap-2">
-      <TabSwitcher active={menu} options={options} onChange={() => {}} />
+      <div className="flex justify-between items-center">
+        <TabSwitcher active={menu} options={options} />
+
+        <Refresh
+          loading={false}
+          onClick={() =>
+            state[menu].refetch({
+              first: 20,
+              after: null,
+            })
+          }
+        />
+      </div>
 
       <DataTable
         data={state[menu].data}
         columns={state[menu].columns}
-        rowCount={state[menu].rowCount || 0 + newItems[menu]}
+        rowCount={state[menu].rowCount}
         loadNext={state[menu].loadNext}
+        loading={state[menu].isLoadingNext}
         fragment={state[menu].fragment}
+        type={menu}
       />
     </div>
   );

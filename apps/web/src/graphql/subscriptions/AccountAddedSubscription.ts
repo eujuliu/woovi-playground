@@ -9,6 +9,9 @@ const AccountAdded = graphql`
       account
         @prependNode(connections: $connections, edgeTypeName: "AccountEdge") {
         id
+        name
+        balance
+        createdAt
         ...AccountFragment
       }
     }

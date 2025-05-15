@@ -12,6 +12,11 @@ const TransactionAdded = graphql`
           edgeTypeName: "TransactionEdge"
         ) {
         id
+        type
+        from
+        to
+        amount
+        createdAt
         ...TransactionFragment
       }
     }
