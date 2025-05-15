@@ -1,6 +1,6 @@
-import { chunkArray, sortByKey, type SortType } from "@/helpers";
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { chunkArray, chunkNumber, sortByKey, type SortType } from "@/helpers";
+import { ArrowDown, ArrowUp, ArrowUpDown, LoaderCircle } from "lucide-react";
+import { type ReactNode, useState, useEffect } from "react";
 import type { LoadMoreFn } from "react-relay";
 import type { OperationType } from "relay-runtime";
 import { DataTableRow } from "./DataTableRow";
@@ -39,6 +39,9 @@ export type DataTableProps<T> = {
   rowCount: number;
   loadNext: LoadMoreFn<OperationType>;
   fragment: any;
+  itemsPerPage?: number;
+  loading: boolean;
+  type?: string;
 };
 
 export const DataTable = <T extends Data>({
@@ -46,19 +49,28 @@ export const DataTable = <T extends Data>({
   columns,
   rowCount,
   loadNext,
+  loading,
   fragment,
+  itemsPerPage = 10,
+  type,
 }: DataTableProps<T>) => {
   const [sorting, setSorting] = useState<Sorting>({
     column: "createdAt",
     type: "dec",
   });
   const [pageIndex, setPageIndex] = useState(0);
-  const itemsPerPage = 10;
-  const pagesCount = Math.round(rowCount / itemsPerPage);
+  const chunksCount = chunkNumber(rowCount, itemsPerPage);
+  const pagesCount = chunksCount.length;
   const chunks = chunkArray(
     sortByKey(raw, sorting.column, sorting.type as "asc" | "dec"),
+    itemsPerPage,
   );
   const data = chunks[pageIndex];
+
+  useEffect(() => {
+    setPageIndex(0);
+    setSorting({ ...sorting, column: "createdAt" });
+  }, [type]);
 
   function sortArrow(active: boolean, type: "asc" | "dec") {
     if (!active) return <ArrowUpDown className="ml-2 h-2 w-2" />;
@@ -98,7 +110,7 @@ export const DataTable = <T extends Data>({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.length ? (
+            {data?.length ? (
               data.map((row) => (
                 <DataTableRow
                   key={row.id}
@@ -134,12 +146,13 @@ export const DataTable = <T extends Data>({
         >
           Previous
         </Button>
+
         <Button
           variant="outline"
           size="sm"
           className="cursor-pointer"
           onClick={() => {
-            if (chunks.length - 1 >= pageIndex + 1)
+            if (chunks[pageIndex + 1]?.length === chunksCount[pageIndex + 1])
               return setPageIndex(pageIndex + 1);
 
             loadNext(10, {
@@ -150,7 +163,7 @@ export const DataTable = <T extends Data>({
           }}
           disabled={pageIndex === pagesCount - 1}
         >
-          Next
+          {loading ? <LoaderCircle className="animate-spin" /> : "Next"}
         </Button>
       </div>
     </div>
