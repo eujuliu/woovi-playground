@@ -91,7 +91,7 @@ export const DataTable = <T extends Data>({
                   {column.canSort ? (
                     <Button
                       variant="ghost"
-                      className={`text-xs font-medium cursor-pointer hover:bg-blue-200 h-7 ${sorting.column === column.id ? "bg-blue-100" : ""}`}
+                      className={`text-xs font-medium cursor-pointer hover:bg-[#113463] hover:text-white transition duration-400 h-7 ${sorting.column === column.id ? "bg-[#133a6f] text-white" : ""}`}
                       onClick={() =>
                         setSorting({
                           column: column.id,

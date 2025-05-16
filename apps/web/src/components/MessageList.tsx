@@ -1,10 +1,11 @@
-import { Send } from "@mui/icons-material";
-import { Box, IconButton, TextField } from "@mui/material";
 import { useMutation } from "react-relay";
 import { useState } from "react";
 
 import { MessageAdd } from "../graphql/mutations/MessageAddMutation";
 import type { MessageAddMutation } from "../__generated__/MessageAddMutation.graphql";
+import { Input } from "./ui/Input";
+import { Button } from "./ui/Button";
+import { LoaderCircle, SendIcon } from "lucide-react";
 
 type MessageListProps = {
   children?: React.ReactNode;
@@ -13,6 +14,7 @@ type MessageListProps = {
 export const MessageList = ({ children }: MessageListProps) => {
   const [content, setContent] = useState("");
   const [messageAdd, isPending] = useMutation<MessageAddMutation>(MessageAdd);
+  const [visible, setVisibility] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -29,39 +31,36 @@ export const MessageList = ({ children }: MessageListProps) => {
   };
 
   return (
-    <Box
-      sx={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-        justifyContent: "flex-end",
-      }}
-    >
-      {children}
-      <form onSubmit={handleSubmit}>
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <TextField
-            label="Message"
-            variant="outlined"
-            size="small"
-            sx={{ width: "100%" }}
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-          />
-          <IconButton
-            type="submit"
-            disabled={isPending}
-            sx={{
-              color: "#FFFFFF",
-              backgroundColor: "#03d69d",
-              borderRadius: 0.5,
-            }}
-          >
-            <Send />
-          </IconButton>
-        </Box>
-      </form>
-    </Box>
+    <div className="flex flex-col justify-end border rounded-sm bg-neutral-50">
+      <Button
+        variant="ghost"
+        className="justify-start h-[34px] text-lg !rounded-b-none"
+        onClick={() => setVisibility(!visible)}
+      >
+        Chat
+      </Button>
+      <div className={`overflow-hidden h-0 ${visible ? "h-full" : ""}`}>
+        <div className="flex flex-col h-[500px] overflow-auto">{children}</div>
+        <form onSubmit={handleSubmit}>
+          <div className="flex gap-1 items-center m-2">
+            <Input
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Type your message"
+            />
+            <Button
+              type="submit"
+              className="bg-[#133a6f] hover:bg-[#113463] h-full rounded-sm transition duration-400"
+            >
+              {isPending ? (
+                <LoaderCircle className="animate-spin" />
+              ) : (
+                <SendIcon />
+              )}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };

@@ -23,6 +23,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { type ReactNode, useState } from "react";
 import { Button } from "./ui/Button";
+import { LoaderCircle } from "lucide-react";
 
 export type FormDialogField = {
   id: string;
@@ -41,6 +42,7 @@ type FormDialogProps = {
   title: string;
   description: string;
   fields: FormDialogField[];
+  loading: boolean;
   onSubmit: (
     values: Record<string, unknown>,
     form: UseFormReturn,
@@ -56,6 +58,7 @@ export const FormDialog = ({
   fields,
   onSubmit,
   onOpenChange,
+  loading,
 }: FormDialogProps) => {
   const [open, setOpen] = useState(false);
   const { schema, defaultValues } = fields.reduce(
@@ -87,7 +90,7 @@ export const FormDialog = ({
       <DialogTrigger asChild>
         <Button
           variant="ghost"
-          className="bg-blue-900 hover:bg-blue-800 text-neutral-50 hover:text-neutral-50 transition-colors delay-100 text-sm cursor-pointer !p-2 !py-1 h-[32px]"
+          className="bg-[#133a6f] hover:bg-[#113463] text-neutral-50 hover:text-neutral-50 transition duration-400 text-sm cursor-pointer !p-2 !py-1 h-[32px]"
         >
           {trigger}
         </Button>
@@ -121,7 +124,7 @@ export const FormDialog = ({
             ))}
 
             <Button type="submit" className="cursor-pointer">
-              Save
+              {loading ? <LoaderCircle className="animate-spin" /> : "Save"}
             </Button>
           </form>
         </Form>
