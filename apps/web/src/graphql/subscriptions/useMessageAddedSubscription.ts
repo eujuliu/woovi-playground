@@ -9,6 +9,7 @@ import { MessageAdded } from "./MessageAddedSubscription";
 
 const useMessageAddedSubscription = (
   variables: MessageAddedSubscription$variables,
+  options?: Partial<GraphQLSubscriptionConfig<MessageAddedSubscription>>,
 ) => {
   const newMessageConfig = useMemo<
     GraphQLSubscriptionConfig<MessageAddedSubscription>
@@ -16,11 +17,9 @@ const useMessageAddedSubscription = (
     () => ({
       subscription: MessageAdded,
       variables,
-      onNext(data) {
-        console.log(data);
-      },
+      ...options,
     }),
-    [variables],
+    [variables, options],
   );
 
   useSubscription(newMessageConfig);

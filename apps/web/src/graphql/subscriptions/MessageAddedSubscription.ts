@@ -8,6 +8,9 @@ const MessageAdded = graphql`
     MessageAdded(input: $input) {
       message
         @appendNode(connections: $connections, edgeTypeName: "MessageEdge") {
+        id
+        content
+        createdAt
         ...Message_message
       }
     }

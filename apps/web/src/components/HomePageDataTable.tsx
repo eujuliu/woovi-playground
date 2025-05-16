@@ -114,6 +114,7 @@ export const HomePageDataTable = ({ queryRefs }: HomePageDataTableProps) => {
         const account = data.AccountAdded.account;
         toast("Account added", {
           description: `Account ${account.id} created at ${DateTime.fromISO(account.createdAt).toFormat("dd/MM/yyyy HH:mm")}`,
+          position: "top-right",
         });
       },
     },
@@ -129,6 +130,7 @@ export const HomePageDataTable = ({ queryRefs }: HomePageDataTableProps) => {
         const transaction = data.TransactionAdded.transaction;
         toast("Transaction added", {
           description: `New ${transaction.type} from ${transaction.from} to ${transaction.to} at ${DateTime.fromISO(transaction.createdAt).toFormat("dd/MM/yyyy HH:mm")}`,
+          position: "top-right",
         });
       },
     },

@@ -16,12 +16,12 @@ export const Message = (props: MessageProps) => {
   );
 
   return (
-    <div className="flex flex-col p-2 gap-2">
-      <div className="flex gap-1">
-        <WooviAvatar />
+    <div className="flex p-2 gap-2 items-center">
+      <WooviAvatar />
+      <div className="flex gap-1 flex-col">
         <div className="flex flex-col">
-          <p className="font-medium">Woovi Playground</p>
-          <p className="font-xs">
+          <p className="font-medium text-sm">Woovi Playground</p>
+          <p className="text-xs">
             {DateTime.fromISO(message.createdAt).toFormat("dd/MM/yyyy HH:mm")}
           </p>
         </div>

@@ -6,6 +6,7 @@ import {
   type RequestParameters,
   type Variables,
 } from "relay-runtime";
+import { toast } from "sonner";
 import { subscribe } from "./websocket";
 
 const ONE_MINUTE_IN_MS = 60 * 1000;
@@ -75,14 +76,12 @@ async function networkFetch(
   // property of the response. If any exceptions occurred when processing the request,
   // throw an error to indicate to the developer what went wrong.
   if (Array.isArray(json.errors)) {
-    console.error(JSON.parse(json));
-    throw new Error(
-      `Error fetching GraphQL query '${
-        params.name
-      }' with variables '${JSON.stringify(variables)}': ${JSON.stringify(
-        json.errors,
-      )}`,
-    );
+    console.error(json);
+    toast("ERROR", {
+      description: json.errors[0].message,
+      position: "top-right",
+    });
+    throw new Error(json.errors[0]);
   }
 
   // Otherwise, return the full payload.

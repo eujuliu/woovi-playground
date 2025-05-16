@@ -38,6 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/Select";
+import { Chat } from "@/components/Chat";
 
 type IndexProps = {
   queryRefs: {
@@ -96,7 +97,7 @@ const newTransferFields: FormDialogField[] = [
     label: "From",
     description: "This is the account that will send the amount",
     defaultValue: "",
-    Control: (field, form) => (
+    Control: (field) => (
       <Input
         placeholder="Type the account ID"
         onChange={field.onChange}
@@ -179,8 +180,8 @@ const Index = ({ queryRefs }: IndexProps) => {
     useMutation<TransactionAddMutation>(TransactionAdd);
 
   return (
-    <div className="flex justify-center items-center">
-      <div className="flex flex-col gap-2 p-4 max-w-[1200px] w-full">
+    <div className="flex flex-col items-center h-dvh relative">
+      <div className="flex flex-col gap-2 p-4 max-w-[1200px] w-full ">
         <div className="flex justify-between items-center flex-wrap gap-2">
           <div className="text-4xl font-medium">Dashboard</div>
           <div className="flex gap-2">
@@ -188,6 +189,7 @@ const Index = ({ queryRefs }: IndexProps) => {
               trigger="Create Account"
               title="Create your new account"
               description="This will create a new account for you, Click in save when you're done"
+              loading={loadingAccount}
               onSubmit={(
                 values: Omit<IAccount, "id" | "createdAt" | "balance">,
                 form: UseFormReturn,
@@ -203,7 +205,6 @@ const Index = ({ queryRefs }: IndexProps) => {
                     setOpen(false);
                     form.reset();
                   },
-                  onError() {},
                 });
               }}
               fields={createAccountFields}
@@ -212,6 +213,7 @@ const Index = ({ queryRefs }: IndexProps) => {
               trigger="New Transfer"
               title="Make a transfer"
               description="This action can't be undone, Click in save when you're done"
+              loading={loadingTransaction}
               onSubmit={(
                 values: Omit<ITransaction, "id" | "createdAt">,
                 form: UseFormReturn,
@@ -225,7 +227,6 @@ const Index = ({ queryRefs }: IndexProps) => {
                     setOpen(false);
                     form.reset();
                   },
-                  onError() {},
                 });
               }}
               fields={newTransferFields}
@@ -233,8 +234,11 @@ const Index = ({ queryRefs }: IndexProps) => {
           </div>
         </div>
         <HomePageDataTable queryRefs={queryRefs} />
-        {/* <Chat queryRef={queryRefs.Messages} /> */}
       </div>
+      <Chat
+        queryRef={queryRefs.Messages}
+        className="absolute bottom-0 right-2"
+      />
     </div>
   );
 };
