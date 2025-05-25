@@ -1,27 +1,26 @@
 {
-	"$schema": "https://turbo.build/schema.json",
-	"globalDependencies": [
-		"**/.env.*local"
-	],
-	"tasks": {
-		"build": {
-			"outputs": [
-				".next/**",
-				"!.next/cache/**"
-			]
-		},
-		"config:local": {},
-		"dev": {
-			"cache": false,
-			"persistent": true
-		},
-		"lint": {},
-		"relay": {},
-		"schema": {},
-		"test": {},
-		"test:watch": {
-			"cache": false,
-			"persistent": true
-		}
-	}
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env.*local"],
+  "tasks": {
+    "build": {
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "build:docker": {
+      "dependsOn": ["^build:docker"],
+      "outputs": []
+    },
+    "config:local": {},
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {},
+    "relay": {},
+    "schema": {},
+    "test": {},
+    "test:watch": {
+      "cache": false,
+      "persistent": true
+    }
+  }
 }

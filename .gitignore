@@ -33,4 +33,7 @@ npm-debug.log*
 # vercel
 .vercel
 
+# tsup
+dist
+
 **/__generated__/*.ts
