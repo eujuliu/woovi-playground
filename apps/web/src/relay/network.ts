@@ -61,7 +61,7 @@ async function networkFetch(
     headers: {
       ...headers,
       "Content-Type": "application/json",
-      "x-api-key": "454ac869-e23d-49d5-a469-4214a692f453",
+      "x-api-key": "454ac869-e23d-49d5-a469-4214a692f453", // only for test
     },
     body: JSON.stringify({
       query: params.text,
@@ -77,6 +77,7 @@ async function networkFetch(
   // throw an error to indicate to the developer what went wrong.
   if (Array.isArray(json.errors)) {
     console.error(json);
+    console.log(json);
     toast("ERROR", {
       description: json.errors[0].message,
       position: "top-right",
