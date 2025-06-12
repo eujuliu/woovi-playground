@@ -69,24 +69,28 @@ async function networkFetch(
     }),
   });
 
-  // Get the response as JSON
-  const json = await response.json();
+  if (response.ok) {
+    // Get the response as JSON
+    const json = await response.json();
 
-  // GraphQL returns exceptions (for example, a missing required variable) in the "errors"
-  // property of the response. If any exceptions occurred when processing the request,
-  // throw an error to indicate to the developer what went wrong.
-  if (Array.isArray(json.errors)) {
-    console.error(json);
-    console.log(json);
-    toast("ERROR", {
-      description: json.errors[0].message,
-      position: "top-right",
-    });
-    throw new Error(json.errors[0]);
+    // GraphQL returns exceptions (for example, a missing required variable) in the "errors"
+    // property of the response. If any exceptions occurred when processing the request,
+    // throw an error to indicate to the developer what went wrong.
+    if (Array.isArray(json.errors)) {
+      console.error(json);
+      console.log(json);
+      toast("ERROR", {
+        description: json.errors[0].message,
+        position: "top-right",
+      });
+      throw new Error(json.errors[0]);
+    }
+
+    // Otherwise, return the full payload.
+    return json;
   }
 
-  // Otherwise, return the full payload.
-  return json;
+  throw new Error("Not possible to access API, try again later");
 }
 
 async function getPreloadedQuery(

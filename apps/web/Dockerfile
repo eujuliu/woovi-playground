@@ -3,9 +3,6 @@ FROM node:18-alpine AS base
 ENV HOSTNAME="0.0.0.0"
 ENV PORT="3000"
 
-ENV NEXT_PUBLIC_GRAPHQL_ENDPOINT="http://localhost:4000/graphql"
-ENV NEXT_PUBLIC_SUBSCRIPTIONS_ENDPOINT="ws://localhost:4000/graphql/ws"
-
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 

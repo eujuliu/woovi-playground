@@ -9,7 +9,7 @@ services:
     environment:
       MONGO_INITDB_DATABASE: woovi-playground
     restart: always
-    command: [ "--replSet", "rs0", "--bind_ip_all", "--port", "27017" ]
+    command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
     healthcheck:
       test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]}) }" | mongosh --port 27017 --quiet
       interval: 5s
@@ -36,8 +36,8 @@ services:
     container_name: redis
     restart: always
     ports:
-      - '6379:6379'
-      - '8001:8001'
+      - "6379:6379"
+      - "8001:8001"
 
 networks:
   woovi-network:
