@@ -4,8 +4,6 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
 ENV PORT=4000
-ENV MONGO_URI="mongodb://localhost/woovi-playground?replicaSet=rs0"
-ENV REDIS_HOST="redis://localhost"
 ENV NODE_ENV="development"
 
 RUN corepack enable
